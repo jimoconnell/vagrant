@@ -1,0 +1,32 @@
+- hosts: foo
+  become: True
+  vars_files:
+    - vars/main.yml
+      #  roles:
+      #    - geerlingguy.nodejs
+      #    - thomfab.byobu
+      #    - jimoconnell.ansible_role_git
+  tasks:
+    - name: Update repositories cache and install "nodejs" package
+      apt:
+         name: nodejs
+         update_cache: yes
+    - name: Update repositories cache and install "NPM" package
+      apt:
+         name: npm
+         update_cache: yes
+    - name: Install Express
+      shell: npm install express --save
+    - name: Install PM2
+      shell: npm install pm2 -g
+    - name: "Install my Git Thing"
+      git: repo=https://github.com/jimoconnell/nodemin.git dest=/home/vagrant/nodemin clone=yes update=yes 
+
+    - name: Delete old pm2 process
+      command: pm2 delete app
+      ignore_errors: yes
+
+    - name: Run Git Thing
+      command: pm2 start  /home/vagrant/nodemin/app.js -i -1
+
+
